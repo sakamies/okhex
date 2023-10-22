@@ -1,0 +1,204 @@
+<title>OKHEX</title>
+<meta charset="utf-8">
+<meta name="description" content="OKLCH needs a hex format. Something like ^AABBCC.">
+<meta property="og:title" content="OKHEX">
+<meta property="og:image" content="http://euro-travel-example.com/thumbnail.jpg">
+<meta property="og:description" content="OKLCH needs a hex format. Something like ^AABBCC.">
+<meta name="twitter:image:alt" content="Diagram of how each pair of hex numbers slots into oklch(l, h, c / a). The first hex pair goes to l, second to h, third to c and fourth to a.">
+<meta name="twitter:site" content="@sakamies">
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  html {
+  }
+  body {
+    /*Use system fonts*/
+    font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+    font-size: 1.4em;
+    line-height: 1.35;
+    max-width: 100%;
+    width: 40rem;
+    margin: auto;
+    padding: 1em .5em .5em .5em;
+    place-items: center;
+  }
+  h1 {
+    margin: 0em 0 .5em 0;
+  }
+  p {
+    margin: 0 0 .5em 0;
+  }
+  img {
+    width: 100%;
+    height: auto;
+  }
+  input {
+    font: inherit;
+    font-size: 1.5em;
+    text-align: inherit;
+    border-radius: .25em;
+    padding: .25em .33em;
+    margin: .25em;
+    width: 7em;
+    border: .1em solid oklch(0 0 0 / .6);
+    box-shadow: 0 0 0 .1em oklch(1 0 0 / .5);
+    background:  oklch(1 0 0 / .98);
+    background-clip: padding-box;
+  }
+  input:focus {
+    outline: none;
+    border: .1em solid oklch(0 0 0 / 1);
+    box-shadow: 0 0 0 .1em oklch(1 0 0 / .9);
+    background:  oklch(1 0 0 / 1);
+  }
+  .diagram {
+    padding: .5em;
+  }
+  .block {
+    width: 100%;
+    display: block;
+    border-radius: .5em;
+    margin: .5em 0;
+    padding: 1em;
+/*     border: .1em solid oklch(0 0 0 / .7); */
+/*     box-shadow: 0 0 0 .1em oklch(1 0 0 / .7); */
+    background:  oklch(1 0 0 / .98);
+  }
+  .text-center {
+    text-align: center;
+  }
+</style>
+
+<div class="block text-center">
+  <label for="okhex">
+    <h1>
+      OKHEX
+    </h1>
+    Try it 👇
+  </label>
+  <br>
+  <input value="^B8FFAB" id="okhex">
+</div>
+<div class="block diagram">
+  <img src="okhex.svg" alt="Diagram of how each pair of hex numbers slots into oklch(l, h, c / a). The first hex pair goes to l, second to h, third to c and fourth to a.">
+</div>
+
+<div class="block">
+  <p>You know what the web needs? Yet another way to write colors!</p>
+
+  <p>
+    I know this idea may come off as a joke, but you know what's the eternal ruler of all color formats? The humble RGB hex.
+  </p>
+
+  <p>
+    <a href="https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl">OKLCH has been making the rounds</a> as the best color format to use for the next decades. I think it's great and I want it to succeed! Needs more memeability though to really break through to <i>everybody</i>.
+  </p>
+
+  <p>
+    So hex! Maybe with some nice prefix character like <code>^</code>, <code>👌</code>, <code>OK</code> or something.
+  </p>
+
+  <p>
+    I could be wrong, but I'd bet RGB hex is the most copy pasted color string in history, let's ride that success into the colors of a new sunrise.
+  </p>
+</div>
+
+<script type="text/javascript">
+
+  //Round numbers to something sane
+  function round (num) {
+    return +(Math.round(num + "e+3")  + "e-3");
+  }
+
+  function hexToPercentage (hex) {
+    console.log('-> hexToPercentage', hex)
+    if (!hex) {
+      console.log('hexToPercentage -> ', hex)
+      return
+    }
+    let num = parseInt(hex, 16)
+    num = num / 255
+    console.log('hexToPercentage ->', num)
+    return round(num)
+  }
+
+  function hexToChroma (hex) {
+    console.log('hexToChroma ->', hex)
+    //No idea what would be a future proof mapping from hex to chroma.
+    //Evil martians color selector at oklch.com goes up to .37 and they are really smart, so I'll use that.
+    let num = parseInt(hex, 16)
+    const magicNumber = 2.702701999 //This will map out 0-255 to 0-0.37
+    num = num / 255 / magicNumber
+    console.log('-> hexToChroma', num)
+    return round(num)
+  }
+
+  function hexToHue (hex) {
+    console.log('-> hexToHue', hex)
+    let num = parseInt(hex, 16)
+    num = num / 255 * 360
+    console.log('hexToHue ->', num)
+    return round(num)
+  }
+
+  function parseOKHEX (value) {
+    console.log('parseOKHEX', value)
+    let hehe = value.replaceAll(/^\^/g, '')
+    console.log({hehe})
+
+    let [L, C, H, A] = hehe.match(/(..)/g)
+    console.log({L, C, H, A})
+    L = hexToPercentage(L)
+    C = hexToChroma(C)
+    H = hexToHue(H)
+    A = hexToPercentage(A)
+    if (A == undefined) {
+      A = 100
+    }
+    console.log('colorObject:', {L, C, H, A})
+    return {L, C, H, A}
+  }
+
+  function colorObjectToString ({L, C, H, A}) {
+    const colorString = `oklch(${L} ${C} ${H} / ${A})`
+    return colorString
+  }
+
+  function getColor (okhex) {
+    console.log('getColor')
+    const colorObject = parseOKHEX(okhex)
+    const colorString = colorObjectToString(colorObject)
+    console.log(colorObject, colorString)
+    return colorString
+  }
+
+  function setBG (okhex) {
+    console.log('setBG', okhex)
+    const color = getColor(okhex)
+    console.log('setBG', color)
+    document.body.style.backgroundColor = color
+  }
+
+
+
+  const colorInput = document.querySelector('#okhex')
+
+  setBG(colorInput.value)
+
+  colorInput.addEventListener('input', (e) => {
+    console.log('')
+    console.log('')
+    console.log('')
+    const value = e.target.value
+    if (!value.match(/^\^/)) {
+      e.target.value = '^' + value
+    }
+    const isHexColor = /([0-9a-fA-F]{8})|([0-9a-fA-F]{6})/
+    if (value.match(isHexColor)) {
+      setBG(value)
+    }
+  })
+
+</script>
