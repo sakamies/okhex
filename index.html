@@ -113,43 +113,33 @@
   }
 
   function hexToPercentage (hex) {
-    console.log('-> hexToPercentage', hex)
     if (!hex) {
-      console.log('hexToPercentage -> ', hex)
       return
     }
     let num = parseInt(hex, 16)
     num = num / 255
-    console.log('hexToPercentage ->', num)
     return round(num)
   }
 
   function hexToChroma (hex) {
-    console.log('hexToChroma ->', hex)
     //No idea what would be a future proof mapping from hex to chroma.
     //Evil martians color selector at oklch.com goes up to .37 and they are really smart, so I'll use that.
     let num = parseInt(hex, 16)
     const magicNumber = 2.702701999 //This will map out 0-255 to 0-0.37
     num = num / 255 / magicNumber
-    console.log('-> hexToChroma', num)
     return round(num)
   }
 
   function hexToHue (hex) {
-    console.log('-> hexToHue', hex)
     let num = parseInt(hex, 16)
     num = num / 255 * 360
-    console.log('hexToHue ->', num)
     return round(num)
   }
 
   function parseOKHEX (value) {
-    console.log('parseOKHEX', value)
     let hehe = value.replaceAll(/^\^/g, '')
-    console.log({hehe})
 
     let [L, C, H, A] = hehe.match(/(..)/g)
-    console.log({L, C, H, A})
     L = hexToPercentage(L)
     C = hexToChroma(C)
     H = hexToHue(H)
@@ -157,7 +147,7 @@
     if (A == undefined) {
       A = 100
     }
-    console.log('colorObject:', {L, C, H, A})
+
     return {L, C, H, A}
   }
 
@@ -167,30 +157,21 @@
   }
 
   function getColor (okhex) {
-    console.log('getColor')
     const colorObject = parseOKHEX(okhex)
     const colorString = colorObjectToString(colorObject)
-    console.log(colorObject, colorString)
     return colorString
   }
 
   function setBG (okhex) {
-    console.log('setBG', okhex)
     const color = getColor(okhex)
-    console.log('setBG', color)
     document.body.style.backgroundColor = color
   }
-
-
 
   const colorInput = document.querySelector('#okhex')
 
   setBG(colorInput.value)
 
   colorInput.addEventListener('input', (e) => {
-    console.log('')
-    console.log('')
-    console.log('')
     const value = e.target.value
     if (!value.match(/^\^/)) {
       e.target.value = '^' + value
